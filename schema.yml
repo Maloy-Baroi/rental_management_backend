@@ -1,0 +1,759 @@
+openapi: 3.0.3
+info:
+  title: Rental Management API
+  version: 1.0.0
+  description: Production-grade rental/property management system API with comprehensive
+    documentation
+  contact:
+    name: Rental Management Support
+    email: support@rentalmanagement.com
+  license:
+    name: Proprietary
+paths:
+  /api/v1/auth/households/:
+    get:
+      operationId: auth_households_list
+      description: List all households created by authenticated user
+      summary: List households
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHouseholdList'
+          description: ''
+    post:
+      operationId: auth_households_create
+      description: Create new household
+      summary: Create household
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HouseholdCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HouseholdCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HouseholdCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HouseholdCreate'
+          description: ''
+  /api/v1/auth/households/{id}/:
+    get:
+      operationId: auth_households_retrieve
+      description: Retrieve household details
+      summary: Get household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Household'
+          description: ''
+    put:
+      operationId: auth_households_update
+      description: Update household details
+      summary: Update household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HouseholdRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HouseholdRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HouseholdRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Household'
+          description: ''
+    patch:
+      operationId: auth_households_partial_update
+      description: Partially update household details
+      summary: Partial update household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHouseholdRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHouseholdRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHouseholdRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Household'
+          description: ''
+    delete:
+      operationId: auth_households_destroy
+      description: Delete household
+      summary: Delete household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+        required: true
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/v1/auth/password/change/:
+    post:
+      operationId: auth_password_change_create
+      description: Change user password
+      summary: Change password
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordChange'
+          description: ''
+  /api/v1/auth/profile/:
+    get:
+      operationId: auth_profile_retrieve
+      description: Retrieve authenticated user profile
+      summary: Get user profile
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: auth_profile_update
+      description: Update authenticated user profile
+      summary: Update user profile
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: auth_profile_partial_update
+      description: Partially update authenticated user profile
+      summary: Partial update user profile
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: auth_register_create
+      description: Create a new user account with phone and password
+      summary: Register new user
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+          description: ''
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /health/:
+    get:
+      operationId: health_retrieve
+      description: Health check endpoint
+      tags:
+      - health
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Household:
+      type: object
+      description: Serializer for household
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          description: Contact phone number
+          maxLength: 128
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - contact_phone
+      - created_at
+      - id
+      - name
+      - updated_at
+      - user
+    HouseholdCreate:
+      type: object
+      description: Serializer for creating household
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          description: Contact phone number
+          maxLength: 128
+      required:
+      - contact_phone
+      - name
+    HouseholdCreateRequest:
+      type: object
+      description: Serializer for creating household
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          minLength: 1
+          description: Contact phone number
+          maxLength: 128
+      required:
+      - contact_phone
+      - name
+    HouseholdRequest:
+      type: object
+      description: Serializer for household
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          minLength: 1
+          description: Contact phone number
+          maxLength: 128
+      required:
+      - contact_phone
+      - name
+    PaginatedHouseholdList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Household'
+    PasswordChange:
+      type: object
+      description: Serializer for password change
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+        new_password_confirm:
+          type: string
+      required:
+      - new_password
+      - new_password_confirm
+      - old_password
+    PasswordChangeRequest:
+      type: object
+      description: Serializer for password change
+      properties:
+        old_password:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+        new_password_confirm:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - new_password_confirm
+      - old_password
+    PatchedHouseholdRequest:
+      type: object
+      description: Serializer for household
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          minLength: 1
+          description: Contact phone number
+          maxLength: 128
+    PatchedUserRequest:
+      type: object
+      description: Serializer for user details
+      properties:
+        phone:
+          type: string
+          minLength: 1
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        is_active:
+          type: boolean
+    TokenObtainPair:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - phone
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    User:
+      type: object
+      description: Serializer for user details
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        phone:
+          type: string
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - phone
+      - updated_at
+    UserRegistration:
+      type: object
+      description: Serializer for user registration
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        phone:
+          type: string
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+      required:
+      - id
+      - phone
+    UserRegistrationRequest:
+      type: object
+      description: Serializer for user registration
+      properties:
+        phone:
+          type: string
+          minLength: 1
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - password_confirm
+      - phone
+    UserRequest:
+      type: object
+      description: Serializer for user details
+      properties:
+        phone:
+          type: string
+          minLength: 1
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        is_active:
+          type: boolean
+      required:
+      - phone
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+servers:
+- url: http://localhost:8000
+  description: Local development server
+- url: http://0.0.0.0:8000
+  description: Docker development server
+tags:
+- name: Authentication
+  description: User authentication and registration endpoints
+- name: Properties
+  description: Property, unit, and location management
+- name: Contracts
+  description: Rental contract management
+- name: Billing
+  description: Bill generation and management
+- name: Payments
+  description: Payment processing and tracking
+- name: Audit
+  description: Audit log and system tracking

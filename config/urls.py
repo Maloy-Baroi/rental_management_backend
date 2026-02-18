@@ -18,10 +18,12 @@ urlpatterns = [
     path('health/', HealthCheckView.as_view(), name='health-check'),
     
     # API Documentation
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    
+    path('api/schema/', SpectacularAPIView.as_view(permission_classes=[]), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema', permission_classes=[]), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema', permission_classes=[]), name='redoc'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema', permission_classes=[]), name='swagger-ui-alt'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema', permission_classes=[]), name='redoc-alt'),
+
     # API v1
     path('api/v1/auth/', include('apps.accounts.urls')),
     path('api/v1/properties/', include('apps.properties.urls')),

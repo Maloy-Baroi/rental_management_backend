@@ -146,14 +146,15 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'EXCEPTION_HANDLER': 'config.exceptions.custom_exception_handler',
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle',
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/hour',
-        'user': '1000/hour',
-    },
+    # Throttling disabled by default - enable per-view when Redis is available
+    # 'DEFAULT_THROTTLE_CLASSES': [
+    #     'rest_framework.throttling.AnonRateThrottle',
+    #     'rest_framework.throttling.UserRateThrottle',
+    # ],
+    # 'DEFAULT_THROTTLE_RATES': {
+    #     'anon': '100/hour',
+    #     'user': '1000/hour',
+    # },
 }
 
 # Simple JWT
@@ -193,16 +194,54 @@ CACHES = {
     }
 }
 
-# Spectacular Settings
+# Spectacular Settings (Swagger/OpenAPI Documentation)
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Rental Management API',
-    'DESCRIPTION': 'Production-grade rental/property management system API',
+    'DESCRIPTION': 'Production-grade rental/property management system API with comprehensive documentation',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_PERMISSIONS': ['rest_framework.permissions.AllowAny'],
     'SWAGGER_UI_DIST': 'SIDECAR',
     'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
     'REDOC_DIST': 'SIDECAR',
     'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': r'/api/v1',
+    'CONTACT': {
+        'name': 'Rental Management Support',
+        'email': 'support@rentalmanagement.com',
+    },
+    'LICENSE': {
+        'name': 'Proprietary',
+    },
+    'TAGS': [
+        {'name': 'Authentication', 'description': 'User authentication and registration endpoints'},
+        {'name': 'Properties', 'description': 'Property, unit, and location management'},
+        {'name': 'Contracts', 'description': 'Rental contract management'},
+        {'name': 'Billing', 'description': 'Bill generation and management'},
+        {'name': 'Payments', 'description': 'Payment processing and tracking'},
+        {'name': 'Audit', 'description': 'Audit log and system tracking'},
+    ],
+    'SERVERS': [
+        {'url': 'http://localhost:8000', 'description': 'Local development server'},
+        {'url': 'http://0.0.0.0:8000', 'description': 'Docker development server'},
+    ],
+    'SECURITY': [{'bearerAuth': []}],
+    'COMPONENTS': {
+        'securitySchemes': {
+            'bearerAuth': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
+    },
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': False,
+        'filter': True,
+        'tryItOutEnabled': True,
+    },
 }
 
 # Stripe

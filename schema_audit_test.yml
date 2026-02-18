@@ -1,0 +1,4083 @@
+openapi: 3.0.3
+info:
+  title: Rental Management API
+  version: 1.0.0
+  description: Production-grade rental/property management system API with comprehensive
+    documentation
+  contact:
+    name: Rental Management Support
+    email: support@rentalmanagement.com
+  license:
+    name: Proprietary
+paths:
+  /api/v1/audit/logs/:
+    get:
+      operationId: audit_logs_list
+      description: List all audit logs
+      summary: Get audit logs list
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+          enum:
+          - approve
+          - create
+          - delete
+          - payment
+          - refund
+          - reject
+          - renew
+          - terminate
+          - update
+        description: |-
+          * `create` - Create
+          * `update` - Update
+          * `delete` - Delete
+          * `approve` - Approve
+          * `reject` - Reject
+          * `terminate` - Terminate
+          * `renew` - Renew
+          * `payment` - Payment
+          * `refund` - Refund
+      - in: query
+        name: actor_user
+        schema:
+          type: integer
+      - in: query
+        name: entity_type
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditLogList'
+          description: ''
+  /api/v1/audit/logs/{id}/:
+    get:
+      operationId: audit_logs_retrieve
+      description: Get a specific audit log by ID
+      summary: Get audit log detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this audit log.
+        required: true
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/audit/logs/by_entity/:
+    get:
+      operationId: audit_logs_by_entity_retrieve
+      description: Get audit logs for a specific entity
+      summary: Get entity audit logs
+      parameters:
+      - in: query
+        name: entity_id
+        schema:
+          type: integer
+        description: ID of the entity
+        required: true
+      - in: query
+        name: entity_type
+        schema:
+          type: string
+        description: Type of entity (e.g., RentalContract, Payment)
+        required: true
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/audit/logs/by_user/:
+    get:
+      operationId: audit_logs_by_user_retrieve
+      description: Get audit logs for a specific user
+      summary: Get user audit logs
+      parameters:
+      - in: query
+        name: user_id
+        schema:
+          type: integer
+        description: ID of the user
+        required: true
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/audit/logs/recent/:
+    get:
+      operationId: audit_logs_recent_retrieve
+      description: Get recent audit logs
+      summary: Get recent audit logs
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          type: integer
+        description: 'Number of recent logs to return (default: 50)'
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/audit/logs/statistics/:
+    get:
+      operationId: audit_logs_statistics_retrieve
+      description: Get audit log statistics
+      summary: Get audit statistics
+      tags:
+      - Audit
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/v1/auth/households/:
+    get:
+      operationId: auth_households_list
+      description: List all households created by authenticated user
+      summary: List households
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHouseholdList'
+          description: ''
+    post:
+      operationId: auth_households_create
+      description: Create new household
+      summary: Create household
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HouseholdCreateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HouseholdCreateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HouseholdCreateRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HouseholdCreate'
+          description: ''
+  /api/v1/auth/households/{id}/:
+    get:
+      operationId: auth_households_retrieve
+      description: Retrieve household details
+      summary: Get household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Household'
+          description: ''
+    put:
+      operationId: auth_households_update
+      description: Update household details
+      summary: Update household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HouseholdRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HouseholdRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HouseholdRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Household'
+          description: ''
+    patch:
+      operationId: auth_households_partial_update
+      description: Partially update household details
+      summary: Partial update household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHouseholdRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHouseholdRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHouseholdRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Household'
+          description: ''
+    delete:
+      operationId: auth_households_destroy
+      description: Delete household
+      summary: Delete household
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPairRequest'
+        required: true
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/v1/auth/password/change/:
+    post:
+      operationId: auth_password_change_create
+      description: Change user password
+      summary: Change password
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordChangeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordChange'
+          description: ''
+  /api/v1/auth/profile/:
+    get:
+      operationId: auth_profile_retrieve
+      description: Retrieve authenticated user profile
+      summary: Get user profile
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: auth_profile_update
+      description: Update authenticated user profile
+      summary: Update user profile
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: auth_profile_partial_update
+      description: Partially update authenticated user profile
+      summary: Partial update user profile
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: auth_register_create
+      description: Create a new user account with phone and password
+      summary: Register new user
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRegistration'
+          description: ''
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/billing/bills/:
+    get:
+      operationId: billing_bills_list
+      description: List all bills
+      summary: Get bills list
+      parameters:
+      - in: query
+        name: billing_month
+        schema:
+          type: string
+      - in: query
+        name: contract
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - overdue
+          - paid
+          - partial
+          - pending
+        description: |-
+          * `pending` - Pending
+          * `paid` - Paid
+          * `overdue` - Overdue
+          * `partial` - Partially Paid
+      - in: query
+        name: utility_type
+        schema:
+          type: integer
+      tags:
+      - Billing
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillList'
+          description: ''
+    post:
+      operationId: billing_bills_create
+      description: Create a new bill
+      summary: Create bill
+      tags:
+      - Billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/billing/bills/{id}/:
+    get:
+      operationId: billing_bills_retrieve
+      description: Get a specific bill by ID
+      summary: Get bill detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bill.
+        required: true
+      tags:
+      - Billing
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+    put:
+      operationId: billing_bills_update
+      description: Update a bill
+      summary: Update bill
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bill.
+        required: true
+      tags:
+      - Billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+    patch:
+      operationId: billing_bills_partial_update
+      description: Partially update a bill
+      summary: Partial update bill
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bill.
+        required: true
+      tags:
+      - Billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBillRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBillRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBillRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+    delete:
+      operationId: billing_bills_destroy
+      description: Delete a bill
+      summary: Delete bill
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bill.
+        required: true
+      tags:
+      - Billing
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/billing/bills/{id}/mark_paid/:
+    post:
+      operationId: billing_bills_mark_paid_create
+      description: Mark bill as paid
+      summary: Mark bill as paid
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this bill.
+        required: true
+      tags:
+      - Billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/billing/bills/overdue/:
+    get:
+      operationId: billing_bills_overdue_retrieve
+      description: Get overdue bills
+      summary: Get overdue bills
+      tags:
+      - Billing
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/billing/bills/pending/:
+    get:
+      operationId: billing_bills_pending_retrieve
+      description: Get pending bills
+      summary: Get pending bills
+      tags:
+      - Billing
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Bill'
+          description: ''
+  /api/v1/contracts/contracts/:
+    get:
+      operationId: contracts_contracts_list
+      description: List all rental contracts
+      summary: Get rental contracts list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - active
+          - expired
+          - terminated
+        description: |-
+          * `active` - Active
+          * `terminated` - Terminated
+          * `expired` - Expired
+      - in: query
+        name: tenant_household
+        schema:
+          type: integer
+      - in: query
+        name: unit
+        schema:
+          type: integer
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRentalContractList'
+          description: ''
+    post:
+      operationId: contracts_contracts_create
+      description: Create a new rental contract
+      summary: Create rental contract
+      tags:
+      - Contracts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalContractRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RentalContractRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RentalContractRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContract'
+          description: ''
+  /api/v1/contracts/contracts/{id}/:
+    get:
+      operationId: contracts_contracts_retrieve
+      description: Get a specific rental contract by ID
+      summary: Get rental contract detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract.
+        required: true
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContract'
+          description: ''
+    put:
+      operationId: contracts_contracts_update
+      description: Update a rental contract
+      summary: Update rental contract
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract.
+        required: true
+      tags:
+      - Contracts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalContractRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RentalContractRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RentalContractRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContract'
+          description: ''
+    patch:
+      operationId: contracts_contracts_partial_update
+      description: Partially update a rental contract
+      summary: Partial update rental contract
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract.
+        required: true
+      tags:
+      - Contracts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRentalContractRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRentalContractRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRentalContractRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContract'
+          description: ''
+    delete:
+      operationId: contracts_contracts_destroy
+      description: Delete a rental contract
+      summary: Delete rental contract
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract.
+        required: true
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/contracts/contracts/{id}/participants/:
+    get:
+      operationId: contracts_contracts_participants_list
+      description: Get participants for a contract
+      summary: Get contract participants
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract.
+        required: true
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - active
+          - expired
+          - terminated
+        description: |-
+          * `active` - Active
+          * `terminated` - Terminated
+          * `expired` - Expired
+      - in: query
+        name: tenant_household
+        schema:
+          type: integer
+      - in: query
+        name: unit
+        schema:
+          type: integer
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRentalContractParticipantList'
+          description: ''
+  /api/v1/contracts/contracts/{id}/terminate/:
+    post:
+      operationId: contracts_contracts_terminate_create
+      description: Terminate a rental contract
+      summary: Terminate contract
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract.
+        required: true
+      tags:
+      - Contracts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                termination_reason:
+                  type: string
+                  description: Reason for termination
+              required:
+              - termination_reason
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContract'
+          description: ''
+  /api/v1/contracts/contracts/active/:
+    get:
+      operationId: contracts_contracts_active_retrieve
+      description: Get active rental contracts
+      summary: Get active contracts
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContract'
+          description: ''
+  /api/v1/contracts/participants/:
+    get:
+      operationId: contracts_participants_list
+      description: List all rental contract participants
+      summary: Get participants list
+      parameters:
+      - in: query
+        name: contract
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+          enum:
+          - dependent
+          - primary
+        description: |-
+          * `primary` - Primary Tenant
+          * `dependent` - Dependent
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRentalContractParticipantList'
+          description: ''
+    post:
+      operationId: contracts_participants_create
+      description: Add a new participant to a contract
+      summary: Create participant
+      tags:
+      - Contracts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalContractParticipantRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RentalContractParticipantRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RentalContractParticipantRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContractParticipant'
+          description: ''
+  /api/v1/contracts/participants/{id}/:
+    get:
+      operationId: contracts_participants_retrieve
+      description: Get a specific participant by ID
+      summary: Get participant detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract participant.
+        required: true
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContractParticipant'
+          description: ''
+    put:
+      operationId: contracts_participants_update
+      description: Update a participant
+      summary: Update participant
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract participant.
+        required: true
+      tags:
+      - Contracts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalContractParticipantRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RentalContractParticipantRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RentalContractParticipantRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContractParticipant'
+          description: ''
+    patch:
+      operationId: contracts_participants_partial_update
+      description: Partially update a participant
+      summary: Partial update participant
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract participant.
+        required: true
+      tags:
+      - Contracts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRentalContractParticipantRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRentalContractParticipantRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRentalContractParticipantRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalContractParticipant'
+          description: ''
+    delete:
+      operationId: contracts_participants_destroy
+      description: Remove a participant from a contract
+      summary: Delete participant
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rental contract participant.
+        required: true
+      tags:
+      - Contracts
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/payments/payments/:
+    get:
+      operationId: payments_payments_list
+      description: List all payments
+      summary: Get payments list
+      parameters:
+      - in: query
+        name: bill
+        schema:
+          type: integer
+      - in: query
+        name: contract
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: payment_type
+        schema:
+          type: string
+          enum:
+          - advance
+          - rent
+          - service
+          - utility
+        description: |-
+          * `rent` - Rent Payment
+          * `utility` - Utility Payment
+          * `service` - Service Charge
+          * `advance` - Advance Payment
+      - in: query
+        name: provider
+        schema:
+          type: string
+          enum:
+          - bank_transfer
+          - cash
+          - mobile_money
+          - stripe
+        description: |-
+          * `stripe` - Stripe
+          * `cash` - Cash
+          * `bank_transfer` - Bank Transfer
+          * `mobile_money` - Mobile Money
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - failed
+          - pending
+          - processing
+          - refunded
+          - succeeded
+        description: |-
+          * `pending` - Pending
+          * `processing` - Processing
+          * `succeeded` - Succeeded
+          * `failed` - Failed
+          * `refunded` - Refunded
+      tags:
+      - Payments
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentList'
+          description: ''
+    post:
+      operationId: payments_payments_create
+      description: Create a new payment
+      summary: Create payment
+      tags:
+      - Payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/v1/payments/payments/{id}/:
+    get:
+      operationId: payments_payments_retrieve
+      description: Get a specific payment by ID
+      summary: Get payment detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment.
+        required: true
+      tags:
+      - Payments
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    put:
+      operationId: payments_payments_update
+      description: Update a payment
+      summary: Update payment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment.
+        required: true
+      tags:
+      - Payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    patch:
+      operationId: payments_payments_partial_update
+      description: Partially update a payment
+      summary: Partial update payment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment.
+        required: true
+      tags:
+      - Payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPaymentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPaymentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPaymentRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+    delete:
+      operationId: payments_payments_destroy
+      description: Delete a payment
+      summary: Delete payment
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment.
+        required: true
+      tags:
+      - Payments
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/payments/payments/pending/:
+    get:
+      operationId: payments_payments_pending_retrieve
+      description: Get pending payments
+      summary: Get pending payments
+      tags:
+      - Payments
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/v1/payments/payments/statistics/:
+    get:
+      operationId: payments_payments_statistics_retrieve
+      description: Get payment statistics
+      summary: Get payment statistics
+      tags:
+      - Payments
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/v1/payments/payments/successful/:
+    get:
+      operationId: payments_payments_successful_retrieve
+      description: Get successful payments
+      summary: Get successful payments
+      tags:
+      - Payments
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/v1/properties/locations/:
+    get:
+      operationId: properties_locations_list
+      description: List all locations
+      summary: Get locations list
+      parameters:
+      - in: query
+        name: country
+        schema:
+          type: string
+      - in: query
+        name: district
+        schema:
+          type: string
+      - in: query
+        name: division
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLocationList'
+          description: ''
+    post:
+      operationId: properties_locations_create
+      description: Create a new location
+      summary: Create location
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+  /api/v1/properties/locations/{id}/:
+    get:
+      operationId: properties_locations_retrieve
+      description: Get a specific location by ID
+      summary: Get location detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this location.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+    put:
+      operationId: properties_locations_update
+      description: Update a location
+      summary: Update location
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this location.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LocationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+    patch:
+      operationId: properties_locations_partial_update
+      description: Partially update a location
+      summary: Partial update location
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this location.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedLocationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedLocationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedLocationRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+          description: ''
+    delete:
+      operationId: properties_locations_destroy
+      description: Delete a location
+      summary: Delete location
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this location.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/properties/properties/:
+    get:
+      operationId: properties_properties_list
+      description: List all properties
+      summary: Get properties list
+      parameters:
+      - in: query
+        name: has_lift
+        schema:
+          type: boolean
+      - in: query
+        name: has_parking
+        schema:
+          type: boolean
+      - in: query
+        name: has_security_guard
+        schema:
+          type: boolean
+      - in: query
+        name: location
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPropertyList'
+          description: ''
+    post:
+      operationId: properties_properties_create
+      description: Create a new property
+      summary: Create property
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+          description: ''
+  /api/v1/properties/properties/{id}/:
+    get:
+      operationId: properties_properties_retrieve
+      description: Get a specific property by ID
+      summary: Get property detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this property.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+          description: ''
+    put:
+      operationId: properties_properties_update
+      description: Update a property
+      summary: Update property
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this property.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PropertyRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+          description: ''
+    patch:
+      operationId: properties_properties_partial_update
+      description: Partially update a property
+      summary: Partial update property
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this property.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPropertyRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPropertyRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPropertyRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Property'
+          description: ''
+    delete:
+      operationId: properties_properties_destroy
+      description: Delete a property
+      summary: Delete property
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this property.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/properties/properties/{id}/units/:
+    get:
+      operationId: properties_properties_units_list
+      description: Get units for a specific property
+      summary: Get property units
+      parameters:
+      - in: query
+        name: has_lift
+        schema:
+          type: boolean
+      - in: query
+        name: has_parking
+        schema:
+          type: boolean
+      - in: query
+        name: has_security_guard
+        schema:
+          type: boolean
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this property.
+        required: true
+      - in: query
+        name: location
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUnitList'
+          description: ''
+  /api/v1/properties/units/:
+    get:
+      operationId: properties_units_list
+      description: List all units
+      summary: Get units list
+      parameters:
+      - in: query
+        name: facing_direction
+        schema:
+          type: string
+          enum:
+          - east
+          - north
+          - north_east
+          - north_west
+          - south
+          - south_east
+          - south_west
+          - west
+        description: |-
+          * `north` - North
+          * `south` - South
+          * `east` - East
+          * `west` - West
+          * `north_east` - North-East
+          * `north_west` - North-West
+          * `south_east` - South-East
+          * `south_west` - South-West
+      - in: query
+        name: floor_no
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: property
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUnitList'
+          description: ''
+    post:
+      operationId: properties_units_create
+      description: Create a new unit
+      summary: Create unit
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UnitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UnitRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+  /api/v1/properties/units/{id}/:
+    get:
+      operationId: properties_units_retrieve
+      description: Get a specific unit by ID
+      summary: Get unit detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this unit.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+    put:
+      operationId: properties_units_update
+      description: Update a unit
+      summary: Update unit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this unit.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UnitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UnitRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+    patch:
+      operationId: properties_units_partial_update
+      description: Partially update a unit
+      summary: Partial update unit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this unit.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUnitRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUnitRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUnitRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+    delete:
+      operationId: properties_units_destroy
+      description: Delete a unit
+      summary: Delete unit
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this unit.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/properties/units/available/:
+    get:
+      operationId: properties_units_available_retrieve
+      description: Get available units
+      summary: Get available units
+      parameters:
+      - in: query
+        name: available
+        schema:
+          type: boolean
+        description: Filter by availability
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: ''
+  /api/v1/properties/utility-types/:
+    get:
+      operationId: properties_utility_types_list
+      description: List all utility types
+      summary: Get utility types list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUtilityTypeList'
+          description: ''
+    post:
+      operationId: properties_utility_types_create
+      description: Create a new utility type
+      summary: Create utility type
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityTypeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UtilityTypeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UtilityTypeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityType'
+          description: ''
+  /api/v1/properties/utility-types/{id}/:
+    get:
+      operationId: properties_utility_types_retrieve
+      description: Get a specific utility type by ID
+      summary: Get utility type detail
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this utility type.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityType'
+          description: ''
+    put:
+      operationId: properties_utility_types_update
+      description: Update a utility type
+      summary: Update utility type
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this utility type.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UtilityTypeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UtilityTypeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UtilityTypeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityType'
+          description: ''
+    patch:
+      operationId: properties_utility_types_partial_update
+      description: Partially update a utility type
+      summary: Partial update utility type
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this utility type.
+        required: true
+      tags:
+      - Properties
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUtilityTypeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUtilityTypeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUtilityTypeRequest'
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UtilityType'
+          description: ''
+    delete:
+      operationId: properties_utility_types_destroy
+      description: Delete a utility type
+      summary: Delete utility type
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this utility type.
+        required: true
+      tags:
+      - Properties
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      responses:
+        '204':
+          description: No response body
+  /health/:
+    get:
+      operationId: health_retrieve
+      description: Health check endpoint
+      tags:
+      - health
+      security:
+      - jwtAuth: []
+      - bearerAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    ActionEnum:
+      enum:
+      - create
+      - update
+      - delete
+      - approve
+      - reject
+      - terminate
+      - renew
+      - payment
+      - refund
+      type: string
+      description: |-
+        * `create` - Create
+        * `update` - Update
+        * `delete` - Delete
+        * `approve` - Approve
+        * `reject` - Reject
+        * `terminate` - Terminate
+        * `renew` - Renew
+        * `payment` - Payment
+        * `refund` - Refund
+    AuditLog:
+      type: object
+      description: Serializer for AuditLog model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        entity_type:
+          type: string
+          description: Type of entity (e.g., RentalContract, Payment)
+          maxLength: 100
+        entity_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          description: ID of the entity
+        content_type:
+          type: integer
+          nullable: true
+        content_type_name:
+          type: string
+          readOnly: true
+        object_id:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: -9223372036854775808
+          format: int64
+          nullable: true
+        action:
+          $ref: '#/components/schemas/ActionEnum'
+        action_display:
+          type: string
+          readOnly: true
+        data:
+          description: Snapshot of changed data
+        actor_user:
+          type: integer
+          nullable: true
+          description: User who performed the action
+        actor_name:
+          type: string
+          readOnly: true
+        actor_phone:
+          type: string
+          readOnly: true
+        ip_address:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - action_display
+      - actor_name
+      - actor_phone
+      - content_type_name
+      - created_at
+      - entity_id
+      - entity_type
+      - id
+    Bill:
+      type: object
+      description: Serializer for Bill model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contract_detail:
+          allOf:
+          - $ref: '#/components/schemas/RentalContract'
+          readOnly: true
+        utility_type_detail:
+          allOf:
+          - $ref: '#/components/schemas/UtilityType'
+          readOnly: true
+        amount_paid:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        amount_remaining:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        is_overdue:
+          type: boolean
+          readOnly: true
+        bill_type:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        billing_month:
+          type: string
+          description: 'Format: YYYY-MM'
+          maxLength: 7
+        due_date:
+          type: string
+          format: date
+        paid_on:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        status:
+          $ref: '#/components/schemas/BillStatusEnum'
+        external_ref:
+          type: string
+          nullable: true
+          description: External reference (e.g., utility bill number)
+          maxLength: 255
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        contract:
+          type: integer
+        utility_type:
+          type: integer
+          nullable: true
+          description: Null for rent bills
+      required:
+      - amount
+      - amount_paid
+      - amount_remaining
+      - bill_type
+      - billing_month
+      - contract
+      - contract_detail
+      - created_at
+      - due_date
+      - id
+      - is_overdue
+      - paid_on
+      - updated_at
+      - utility_type
+      - utility_type_detail
+    BillRequest:
+      type: object
+      description: Serializer for Bill model
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        billing_month:
+          type: string
+          minLength: 1
+          description: 'Format: YYYY-MM'
+          maxLength: 7
+        due_date:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/BillStatusEnum'
+        external_ref:
+          type: string
+          nullable: true
+          description: External reference (e.g., utility bill number)
+          maxLength: 255
+        contract:
+          type: integer
+        utility_type:
+          type: integer
+          nullable: true
+          description: Null for rent bills
+      required:
+      - amount
+      - billing_month
+      - contract
+      - due_date
+      - utility_type
+    BillStatusEnum:
+      enum:
+      - pending
+      - paid
+      - overdue
+      - partial
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `paid` - Paid
+        * `overdue` - Overdue
+        * `partial` - Partially Paid
+    FacingDirectionEnum:
+      enum:
+      - north
+      - south
+      - east
+      - west
+      - north_east
+      - north_west
+      - south_east
+      - south_west
+      type: string
+      description: |-
+        * `north` - North
+        * `south` - South
+        * `east` - East
+        * `west` - West
+        * `north_east` - North-East
+        * `north_west` - North-West
+        * `south_east` - South-East
+        * `south_west` - South-West
+    Household:
+      type: object
+      description: Serializer for household
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          description: Contact phone number
+          maxLength: 128
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - contact_phone
+      - created_at
+      - id
+      - name
+      - updated_at
+      - user
+    HouseholdCreate:
+      type: object
+      description: Serializer for creating household
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          description: Contact phone number
+          maxLength: 128
+      required:
+      - contact_phone
+      - name
+    HouseholdCreateRequest:
+      type: object
+      description: Serializer for creating household
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          minLength: 1
+          description: Contact phone number
+          maxLength: 128
+      required:
+      - contact_phone
+      - name
+    HouseholdRequest:
+      type: object
+      description: Serializer for household
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          minLength: 1
+          description: Contact phone number
+          maxLength: 128
+      required:
+      - contact_phone
+      - name
+    Location:
+      type: object
+      description: Serializer for Location model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        area_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        village:
+          type: string
+          nullable: true
+          maxLength: 255
+        ward:
+          type: string
+          nullable: true
+          maxLength: 100
+        zone_or_union:
+          type: string
+          nullable: true
+          maxLength: 255
+        city_corporation:
+          type: string
+          nullable: true
+          maxLength: 255
+        upazila_or_thana:
+          type: string
+          nullable: true
+          maxLength: 255
+        district:
+          type: string
+          maxLength: 255
+        division:
+          type: string
+          maxLength: 255
+        country:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - district
+      - division
+      - id
+      - updated_at
+    LocationRequest:
+      type: object
+      description: Serializer for Location model
+      properties:
+        area_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        village:
+          type: string
+          nullable: true
+          maxLength: 255
+        ward:
+          type: string
+          nullable: true
+          maxLength: 100
+        zone_or_union:
+          type: string
+          nullable: true
+          maxLength: 255
+        city_corporation:
+          type: string
+          nullable: true
+          maxLength: 255
+        upazila_or_thana:
+          type: string
+          nullable: true
+          maxLength: 255
+        district:
+          type: string
+          minLength: 1
+          maxLength: 255
+        division:
+          type: string
+          minLength: 1
+          maxLength: 255
+        country:
+          type: string
+          minLength: 1
+          maxLength: 100
+      required:
+      - district
+      - division
+    PaginatedAuditLogList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLog'
+    PaginatedBillList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bill'
+    PaginatedHouseholdList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Household'
+    PaginatedLocationList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+    PaginatedPaymentList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+    PaginatedPropertyList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Property'
+    PaginatedRentalContractList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalContract'
+    PaginatedRentalContractParticipantList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RentalContractParticipant'
+    PaginatedUnitList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Unit'
+    PaginatedUtilityTypeList:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UtilityType'
+    PasswordChange:
+      type: object
+      description: Serializer for password change
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+        new_password_confirm:
+          type: string
+      required:
+      - new_password
+      - new_password_confirm
+      - old_password
+    PasswordChangeRequest:
+      type: object
+      description: Serializer for password change
+      properties:
+        old_password:
+          type: string
+          minLength: 1
+        new_password:
+          type: string
+          minLength: 1
+        new_password_confirm:
+          type: string
+          minLength: 1
+      required:
+      - new_password
+      - new_password_confirm
+      - old_password
+    PatchedBillRequest:
+      type: object
+      description: Serializer for Bill model
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        billing_month:
+          type: string
+          minLength: 1
+          description: 'Format: YYYY-MM'
+          maxLength: 7
+        due_date:
+          type: string
+          format: date
+        status:
+          $ref: '#/components/schemas/BillStatusEnum'
+        external_ref:
+          type: string
+          nullable: true
+          description: External reference (e.g., utility bill number)
+          maxLength: 255
+        contract:
+          type: integer
+        utility_type:
+          type: integer
+          nullable: true
+          description: Null for rent bills
+    PatchedHouseholdRequest:
+      type: object
+      description: Serializer for household
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        date_of_birth:
+          type: string
+          format: date
+          nullable: true
+        nid:
+          type: string
+          nullable: true
+          description: National ID number
+          pattern: ^\d{10}$|^\d{13}$|^\d{17}$
+          maxLength: 50
+        contact_phone:
+          type: string
+          minLength: 1
+          description: Contact phone number
+          maxLength: 128
+    PatchedLocationRequest:
+      type: object
+      description: Serializer for Location model
+      properties:
+        area_name:
+          type: string
+          nullable: true
+          maxLength: 255
+        village:
+          type: string
+          nullable: true
+          maxLength: 255
+        ward:
+          type: string
+          nullable: true
+          maxLength: 100
+        zone_or_union:
+          type: string
+          nullable: true
+          maxLength: 255
+        city_corporation:
+          type: string
+          nullable: true
+          maxLength: 255
+        upazila_or_thana:
+          type: string
+          nullable: true
+          maxLength: 255
+        district:
+          type: string
+          minLength: 1
+          maxLength: 255
+        division:
+          type: string
+          minLength: 1
+          maxLength: 255
+        country:
+          type: string
+          minLength: 1
+          maxLength: 100
+    PatchedPaymentRequest:
+      type: object
+      description: Serializer for Payment model
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        payment_type:
+          $ref: '#/components/schemas/PaymentTypeEnum'
+        provider:
+          $ref: '#/components/schemas/ProviderEnum'
+        provider_payment_id:
+          type: string
+          nullable: true
+          description: Payment ID from payment provider
+          maxLength: 255
+        status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+        idempotency_key:
+          type: string
+          minLength: 1
+          description: Unique key to prevent duplicate payments
+          maxLength: 255
+        metadata:
+          description: Additional payment metadata
+        contract:
+          type: integer
+        bill:
+          type: integer
+          nullable: true
+        received_by_user:
+          type: integer
+          nullable: true
+          description: User who received the payment (for cash/manual)
+    PatchedPropertyRequest:
+      type: object
+      description: Serializer for Property model
+      properties:
+        house_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        age_of_building:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        total_floors:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        has_lift:
+          type: boolean
+        has_security_guard:
+          type: boolean
+        has_parking:
+          type: boolean
+        is_tiled:
+          type: boolean
+        photos: {}
+        location:
+          type: integer
+    PatchedRentalContractParticipantRequest:
+      type: object
+      description: Serializer for RentalContractParticipant model
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        contract:
+          type: integer
+        household:
+          type: integer
+    PatchedRentalContractRequest:
+      type: object
+      description: Serializer for RentalContract model
+      properties:
+        contract_from:
+          type: string
+          format: date
+        contract_to:
+          type: string
+          format: date
+        rent_amount_at_contract:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        advance_paid_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        service_charge_at_contract:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/RentalContractStatusEnum'
+        terminated_at:
+          type: string
+          format: date-time
+          nullable: true
+        termination_reason:
+          type: string
+          nullable: true
+        unit:
+          type: integer
+        tenant_household:
+          type: integer
+    PatchedUnitRequest:
+      type: object
+      description: Serializer for Unit model
+      properties:
+        apartment_no:
+          type: string
+          minLength: 1
+          maxLength: 50
+        floor_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        facing_direction:
+          $ref: '#/components/schemas/FacingDirectionEnum'
+        size_sqft:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        property:
+          type: integer
+    PatchedUserRequest:
+      type: object
+      description: Serializer for user details
+      properties:
+        phone:
+          type: string
+          minLength: 1
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        is_active:
+          type: boolean
+    PatchedUtilityTypeRequest:
+      type: object
+      description: Serializer for UtilityType model
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+    Payment:
+      type: object
+      description: Serializer for Payment model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contract_detail:
+          allOf:
+          - $ref: '#/components/schemas/RentalContract'
+          readOnly: true
+        bill_detail:
+          allOf:
+          - $ref: '#/components/schemas/Bill'
+          readOnly: true
+        received_by_name:
+          type: string
+          readOnly: true
+        payment_type_display:
+          type: string
+          readOnly: true
+        provider_display:
+          type: string
+          readOnly: true
+        status_display:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        payment_type:
+          $ref: '#/components/schemas/PaymentTypeEnum'
+        provider:
+          $ref: '#/components/schemas/ProviderEnum'
+        provider_payment_id:
+          type: string
+          nullable: true
+          description: Payment ID from payment provider
+          maxLength: 255
+        status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+        idempotency_key:
+          type: string
+          description: Unique key to prevent duplicate payments
+          maxLength: 255
+        metadata:
+          description: Additional payment metadata
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        contract:
+          type: integer
+        bill:
+          type: integer
+          nullable: true
+        received_by_user:
+          type: integer
+          nullable: true
+          description: User who received the payment (for cash/manual)
+      required:
+      - amount
+      - bill_detail
+      - contract
+      - contract_detail
+      - created_at
+      - id
+      - idempotency_key
+      - payment_type
+      - payment_type_display
+      - provider_display
+      - received_by_name
+      - status_display
+      - updated_at
+    PaymentRequest:
+      type: object
+      description: Serializer for Payment model
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        payment_type:
+          $ref: '#/components/schemas/PaymentTypeEnum'
+        provider:
+          $ref: '#/components/schemas/ProviderEnum'
+        provider_payment_id:
+          type: string
+          nullable: true
+          description: Payment ID from payment provider
+          maxLength: 255
+        status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+        idempotency_key:
+          type: string
+          minLength: 1
+          description: Unique key to prevent duplicate payments
+          maxLength: 255
+        metadata:
+          description: Additional payment metadata
+        contract:
+          type: integer
+        bill:
+          type: integer
+          nullable: true
+        received_by_user:
+          type: integer
+          nullable: true
+          description: User who received the payment (for cash/manual)
+      required:
+      - amount
+      - contract
+      - idempotency_key
+      - payment_type
+    PaymentStatusEnum:
+      enum:
+      - pending
+      - processing
+      - succeeded
+      - failed
+      - refunded
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `processing` - Processing
+        * `succeeded` - Succeeded
+        * `failed` - Failed
+        * `refunded` - Refunded
+    PaymentTypeEnum:
+      enum:
+      - rent
+      - utility
+      - service
+      - advance
+      type: string
+      description: |-
+        * `rent` - Rent Payment
+        * `utility` - Utility Payment
+        * `service` - Service Charge
+        * `advance` - Advance Payment
+    Property:
+      type: object
+      description: Serializer for Property model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        location_detail:
+          allOf:
+          - $ref: '#/components/schemas/Location'
+          readOnly: true
+        created_by_name:
+          type: string
+          readOnly: true
+        total_units:
+          type: integer
+          readOnly: true
+        house_name:
+          type: string
+          maxLength: 255
+        age_of_building:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        total_floors:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        has_lift:
+          type: boolean
+        has_security_guard:
+          type: boolean
+        has_parking:
+          type: boolean
+        is_tiled:
+          type: boolean
+        photos: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        location:
+          type: integer
+        created_by:
+          type: integer
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - created_by_name
+      - house_name
+      - id
+      - location
+      - location_detail
+      - total_floors
+      - total_units
+      - updated_at
+    PropertyRequest:
+      type: object
+      description: Serializer for Property model
+      properties:
+        house_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        age_of_building:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+          nullable: true
+        total_floors:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        has_lift:
+          type: boolean
+        has_security_guard:
+          type: boolean
+        has_parking:
+          type: boolean
+        is_tiled:
+          type: boolean
+        photos: {}
+        location:
+          type: integer
+      required:
+      - house_name
+      - location
+      - total_floors
+    ProviderEnum:
+      enum:
+      - stripe
+      - cash
+      - bank_transfer
+      - mobile_money
+      type: string
+      description: |-
+        * `stripe` - Stripe
+        * `cash` - Cash
+        * `bank_transfer` - Bank Transfer
+        * `mobile_money` - Mobile Money
+    RentalContract:
+      type: object
+      description: Serializer for RentalContract model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        unit_detail:
+          allOf:
+          - $ref: '#/components/schemas/Unit'
+          readOnly: true
+        tenant_household_name:
+          type: string
+          readOnly: true
+        created_by_name:
+          type: string
+          readOnly: true
+        duration_days:
+          type: string
+          readOnly: true
+        contract_from:
+          type: string
+          format: date
+        contract_to:
+          type: string
+          format: date
+        rent_amount_at_contract:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        advance_paid_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        service_charge_at_contract:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/RentalContractStatusEnum'
+        terminated_at:
+          type: string
+          format: date-time
+          nullable: true
+        termination_reason:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        unit:
+          type: integer
+        tenant_household:
+          type: integer
+        created_by:
+          type: integer
+          readOnly: true
+      required:
+      - contract_from
+      - contract_to
+      - created_at
+      - created_by
+      - created_by_name
+      - duration_days
+      - id
+      - rent_amount_at_contract
+      - tenant_household
+      - tenant_household_name
+      - unit
+      - unit_detail
+      - updated_at
+    RentalContractParticipant:
+      type: object
+      description: Serializer for RentalContractParticipant model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        contract_detail:
+          allOf:
+          - $ref: '#/components/schemas/RentalContract'
+          readOnly: true
+        household_member_name:
+          type: string
+          readOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        contract:
+          type: integer
+        household:
+          type: integer
+      required:
+      - contract
+      - contract_detail
+      - created_at
+      - household
+      - household_member_name
+      - id
+      - role
+    RentalContractParticipantRequest:
+      type: object
+      description: Serializer for RentalContractParticipant model
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        contract:
+          type: integer
+        household:
+          type: integer
+      required:
+      - contract
+      - household
+      - role
+    RentalContractRequest:
+      type: object
+      description: Serializer for RentalContract model
+      properties:
+        contract_from:
+          type: string
+          format: date
+        contract_to:
+          type: string
+          format: date
+        rent_amount_at_contract:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        advance_paid_months:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        service_charge_at_contract:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        status:
+          $ref: '#/components/schemas/RentalContractStatusEnum'
+        terminated_at:
+          type: string
+          format: date-time
+          nullable: true
+        termination_reason:
+          type: string
+          nullable: true
+        unit:
+          type: integer
+        tenant_household:
+          type: integer
+      required:
+      - contract_from
+      - contract_to
+      - rent_amount_at_contract
+      - tenant_household
+      - unit
+    RentalContractStatusEnum:
+      enum:
+      - active
+      - terminated
+      - expired
+      type: string
+      description: |-
+        * `active` - Active
+        * `terminated` - Terminated
+        * `expired` - Expired
+    RoleEnum:
+      enum:
+      - primary
+      - dependent
+      type: string
+      description: |-
+        * `primary` - Primary Tenant
+        * `dependent` - Dependent
+    TokenObtainPair:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - refresh
+    TokenObtainPairRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - phone
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    Unit:
+      type: object
+      description: Serializer for Unit model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        property_detail:
+          allOf:
+          - $ref: '#/components/schemas/Property'
+          readOnly: true
+        is_available:
+          type: boolean
+          readOnly: true
+        apartment_no:
+          type: string
+          maxLength: 50
+        floor_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        facing_direction:
+          $ref: '#/components/schemas/FacingDirectionEnum'
+        size_sqft:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        property:
+          type: integer
+      required:
+      - apartment_no
+      - created_at
+      - facing_direction
+      - floor_no
+      - id
+      - is_available
+      - property
+      - property_detail
+      - size_sqft
+      - updated_at
+    UnitRequest:
+      type: object
+      description: Serializer for Unit model
+      properties:
+        apartment_no:
+          type: string
+          minLength: 1
+          maxLength: 50
+        floor_no:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        facing_direction:
+          $ref: '#/components/schemas/FacingDirectionEnum'
+        size_sqft:
+          type: integer
+          maximum: 2147483647
+          minimum: 1
+        property:
+          type: integer
+      required:
+      - apartment_no
+      - facing_direction
+      - floor_no
+      - property
+      - size_sqft
+    User:
+      type: object
+      description: Serializer for user details
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        phone:
+          type: string
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - phone
+      - updated_at
+    UserRegistration:
+      type: object
+      description: Serializer for user registration
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        phone:
+          type: string
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+      required:
+      - id
+      - phone
+    UserRegistrationRequest:
+      type: object
+      description: Serializer for user registration
+      properties:
+        phone:
+          type: string
+          minLength: 1
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password_confirm:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - password_confirm
+      - phone
+    UserRequest:
+      type: object
+      description: Serializer for user details
+      properties:
+        phone:
+          type: string
+          minLength: 1
+          description: User phone number (primary identifier)
+          maxLength: 128
+        email:
+          type: string
+          format: email
+          nullable: true
+          maxLength: 254
+        is_active:
+          type: boolean
+      required:
+      - phone
+    UtilityType:
+      type: object
+      description: Serializer for UtilityType model
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+      required:
+      - id
+      - name
+    UtilityTypeRequest:
+      type: object
+      description: Serializer for UtilityType model
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+      required:
+      - name
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+servers:
+- url: http://localhost:8000
+  description: Local development server
+- url: http://0.0.0.0:8000
+  description: Docker development server
+tags:
+- name: Authentication
+  description: User authentication and registration endpoints
+- name: Properties
+  description: Property, unit, and location management
+- name: Contracts
+  description: Rental contract management
+- name: Billing
+  description: Bill generation and management
+- name: Payments
+  description: Payment processing and tracking
+- name: Audit
+  description: Audit log and system tracking
